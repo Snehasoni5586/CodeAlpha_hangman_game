@@ -1,78 +1,70 @@
-# CodeAlpha Internship - Task 2
-# Stock Portfolio Tracker
 
-print("=" * 45)
-print("       STOCK PORTFOLIO TRACKER")
-print("=" * 45)
+import csv
 
-# Stock prices (sample prices in INR)
-stock_prices = {
-    "TCS": 3500,
-    "INFY": 1800,
-    "RELIANCE": 1400,
-    "WIPRO": 500,
-    "HDFC": 1700
+# Stock prices
+stocks = {
+    "AAPL": 180,
+    "TSLA": 250
 }
 
-portfolio = {}
+print("=== Stock Portfolio Tracker ===")
+
 total_investment = 0
 
-print("\nAvailable Stocks:")
-for stock, price in stock_prices.items():
-    print(f"{stock:12} Rs. {price:,.2f}")
+# Get quantity from user
+portfolio = {}
 
-print("\nEnter your stock investments")
-print("-" * 45)
+for stock, price in stocks.items():
+    quantity = int(input(f"Enter quantity of {stock}: "))
+    investment = price * quantity
 
-while True:
-    stock = input(
-        "\nEnter stock name (or DONE to finish): "
-    ).strip().upper()
+    portfolio[stock] = {
+        "price": price,
+        "quantity": quantity,
+        "investment": investment
+    }2
 
-    if stock == "DONE":
-        break
+    total_investment += investment
 
-    if stock not in stock_prices:
-        print("Invalid stock! Please choose from the list.")
-        continue
+# Display portfolio
+print("\n--- Your Portfolio ---")
 
-    try:
-        quantity = int(input(f"Enter quantity of {stock}: "))
+for stock, details in portfolio.items():
+    print(
+        f"{stock}: Price = ${details['price']}, "
+        f"Quantity = {details['quantity']}, "
+        f"Investment = ${details['investment']}"
+    )
 
-        if quantity <= 0:
-            print("Quantity must be greater than zero.")
-            continue
+print(f"\nTotal Investment: ${total_investment}")
 
-    except ValueError:
-        print("Please enter a valid whole number.")
-        continue
+# Save portfolio to TXT file
+with open("portfolio.txt", "w") as file:
+    file.write("Stock Portfolio Report\n")
+    file.write("----------------------\n")
 
-    portfolio[stock] = portfolio.get(stock, 0) + quantity
-    print(f"{quantity} shares of {stock} added successfully!")
-
-print("\n" + "=" * 45)
-print("             PORTFOLIO REPORT")
-print("=" * 45)
-
-if not portfolio:
-    print("No stocks added to your portfolio.")
-else:
-    print(f"{'STOCK':<12}{'QTY':>6}{'PRICE':>12}{'VALUE':>15}")
-    print("-" * 45)
-
-    for stock, quantity in portfolio.items():
-        price = stock_prices[stock]
-        value = quantity * price
-        total_investment += value
-
-        print(
-            f"{stock:<12}{quantity:>6}"
-            f"{price:>12,.2f}{value:>15,.2f}"
+    for stock, details in portfolio.items():
+        file.write(
+            f"{stock}: Price=${details['price']}, "
+            f"Quantity={details['quantity']}, "
+            f"Investment=${details['investment']}\n"
         )
 
-    print("-" * 45)
-    print(f"Total Portfolio Value: Rs. {total_investment:,.2f}")
+    file.write(f"\nTotal Investment: ${total_investment}\n")
 
-print("=" * 45)
-print("     Thank you for using the tracker!")
-print("=" * 45)
+# Save portfolio to CSV file
+with open("portfolio.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Stock", "Price", "Quantity", "Investment"])
+
+    for stock, details in portfolio.items():
+        writer.writerow([
+            stock,
+            details["price"],
+            details["quantity"],
+            details["investment"]
+        ])
+
+    writer.writerow(["", "", "Total", total_investment])
+
+print("\nPortfolio saved to portfolio.txt and portfolio.csv")
